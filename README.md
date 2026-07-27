@@ -1,6 +1,6 @@
 # GroveNFC Reference Demo (AtomS3 + M5Stick + CardPuter + M5Paper)
 
-Reference firmware demo for **Grove NFC module** on **AtomS3 / M5StickS3 / M5StickC Plus (1.1/2 unified firmware) / CardPuter / CardPuter ADV (single firmware logic) / M5Paper**.
+Reference firmware demo for **Grove NFC module** on **AtomS3 / M5StickS3 / M5StickC Plus (including Plus SE; shared firmware) / CardPuter / CardPuter ADV (single firmware logic) / M5Paper**.
 
 This project demonstrates one implementation path. GroveNFC capability can be adapted to other hardware platforms in the future via **I2C/UART communication paths**.
 
@@ -40,7 +40,7 @@ Current board I2C pins (auto-selected in `src/main.cpp` by build target):
 
 - AtomS3: SDA `GPIO2`, SCL `GPIO1`
 - M5StickS3: SDA `GPIO9`, SCL `GPIO10`
-- M5StickC Plus (1.1 / Plus2 unified): SDA `GPIO32`, SCL `GPIO33`
+- M5StickC Plus / Plus SE: SDA `GPIO32`, SCL `GPIO33`
 - CardPuter / CardPuter ADV: SDA `GPIO2`, SCL `GPIO1`
 - M5Paper Port A: SDA `GPIO25`, SCL `GPIO32`
 - I2C address: `0x48`
@@ -51,7 +51,15 @@ Pin mapping note:
 
 Audio note:
 
-- M5StickC Plus (1.1 / Plus2) use **PWM buzzer** (no full speaker path).
+- M5StickC Plus / Plus SE use a **passive buzzer** through the M5Unified speaker API.
+
+M5StickC Plus SE compatibility note:
+
+- Plus SE removes the MPU6886 IMU, which this firmware does not use.
+- Its ESP32-PICO-D4, AXP192 PMU, 135 x 240 ST7789v2 display, buttons, buzzer,
+  and Grove `GPIO32/33` connection match the original Plus for this project.
+- `m5stack-stickcplus` and `m5stack-stickcplus-se` therefore build the same
+  firmware image; either image can be flashed to both models.
 
 If your wiring uses different pins, update `kSdaPin` and `kSclPin`.
 
@@ -141,6 +149,7 @@ Set `kAutoBootDebug` to `false` in `src/main.cpp` to disable it.
   - `m5stack-atoms3`
   - `m5stack-sticks3`
   - `m5stack-stickcplus`
+    - `m5stack-stickcplus-se` (same firmware as `m5stack-stickcplus`)
     - `m5stack-stickcplus2` (alias of `m5stack-stickcplus`)
   - `m5stack-cardputer` (CardPuter / CardPuter ADV shared logic)
   - `m5stack-cardputer-adv` (alias of `m5stack-cardputer`)
@@ -155,6 +164,8 @@ pio run -e m5stack-atoms3 -t upload
 pio run -e m5stack-sticks3 -t upload
 # or
 pio run -e m5stack-stickcplus -t upload
+# or
+pio run -e m5stack-stickcplus-se -t upload
 # or
 pio run -e m5stack-stickcplus2 -t upload
 # or

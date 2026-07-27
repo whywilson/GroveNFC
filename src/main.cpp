@@ -8015,7 +8015,16 @@ void setup() {
 #else
  auto cfg = M5.config();
 #if defined(APP_TARGET_STICKCPLUS)
+  // Plus SE has no IMU. GroveNFC does not use motion sensing, so disabling the
+  // probe keeps this same firmware compatible with both Plus and Plus SE.
+  cfg.internal_imu = false;
+#if defined(APP_TARGET_STICKCPLUS_SE)
+  // Plus SE has no IMU but retains the GPIO2 passive PWM buzzer.
+  cfg.internal_mic = false;
   cfg.internal_spk = true;
+#else
+  cfg.internal_spk = true;
+#endif
 #endif
 #if defined(APP_TARGET_STICKS3)
   cfg.internal_spk = true;
@@ -8025,6 +8034,8 @@ void setup() {
 #else
   M5.begin(cfg);
 #endif
+  Serial.println("[BOOT] M5 init complete");
+  Serial.flush();
 #if defined(APP_TARGET_STICKS3) || defined(APP_TARGET_CARDPUTER) || defined(APP_TARGET_CARDPUTER_ADV)
   M5.Power.setExtOutput(true);
 #endif
@@ -8063,8 +8074,12 @@ void setup() {
   M5.Display.setFont(&fonts::Font0);
   g_canvas.setColorDepth(16);
   g_canvas.createSprite(M5.Display.width(), M5.Display.height());
+  Serial.printf("[BOOT] Canvas %dx%d created\n", M5.Display.width(), M5.Display.height());
+  Serial.flush();
 #endif
   littlefs_ready = LittleFS.begin(true);
+  Serial.printf("[BOOT] LittleFS=%s\n", littlefs_ready ? "OK" : "FAIL");
+  Serial.flush();
   if (!littlefs_ready) {
     Serial.println("[FS] LittleFS init failed");
     emu_dump_status = "LittleFS fail";
@@ -8076,6 +8091,8 @@ void setup() {
   loadPianoConfig();
 
   nfc_ready = initNfcAtBoot();
+  Serial.printf("[BOOT] NFC init=%s\n", nfc_ready ? "OK" : "FAIL");
+  Serial.flush();
   nfc_module_name = nfc_ready ? String(nfc.deviceName()) : String("GroveNFC");
   hw_ver = nfc.hardwareVersion();
   fw_ver = nfc.firmwareVersion();
